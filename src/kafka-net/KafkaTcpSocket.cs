@@ -169,8 +169,13 @@ namespace KafkaNet
 
         private void ProcessNetworkstreamTasks(NetworkStream netStream)
         {
+#if NET40
+            Task writeTask = TaskEx.FromResult(true);
+            Task readTask = TaskEx.FromResult(true);
+#else
             Task writeTask = Task.FromResult(true);
             Task readTask = Task.FromResult(true);
+#endif
 
             //reading/writing from network steam is not thread safe
             //Read and write operations can be performed simultaneously on an instance of the NetworkStream class without the need for synchronization. 
@@ -179,8 +184,13 @@ namespace KafkaNet
             //https://msdn.microsoft.com/en-us/library/z2xae4f4.aspx
             while (_disposeToken.IsCancellationRequested == false && netStream != null)
             {
+#if NET40
+                Task sendDataReady = TaskEx.WhenAll(writeTask, _sendTaskQueue.OnHasDataAvailable(_disposeToken.Token));
+                Task readDataReady = TaskEx.WhenAll(readTask, _readTaskQueue.OnHasDataAvailable(_disposeToken.Token));
+#else
                 Task sendDataReady = Task.WhenAll(writeTask, _sendTaskQueue.OnHasDataAvailable(_disposeToken.Token));
                 Task readDataReady = Task.WhenAll(readTask, _readTaskQueue.OnHasDataAvailable(_disposeToken.Token));
+#endif
 
                 Task.WaitAny(sendDataReady, readDataReady);
 
@@ -349,7 +359,11 @@ namespace KafkaNet
                     _log.WarnFormat("Failed connection to:{0}.  Will retry in:{1}", _endpoint, reconnectionDelay);
                 }
 
+#if NET40
+                await TaskEx.Delay(TimeSpan.FromMilliseconds(reconnectionDelay), _disposeToken.Token).ConfigureAwait(false);
+#else
                 await Task.Delay(TimeSpan.FromMilliseconds(reconnectionDelay), _disposeToken.Token).ConfigureAwait(false);
+#endif
             }
 
             return _client;

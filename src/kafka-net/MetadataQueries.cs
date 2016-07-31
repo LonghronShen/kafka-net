@@ -36,23 +36,27 @@ namespace KafkaNet
                     {
                         var route = _brokerRouter.SelectBrokerRoute(topic, p.Key);
                         var request = new OffsetRequest
-                                        {
-                                            Offsets = new List<Offset>
-                                                {
-                                                    new Offset
-                                                    {
-                                                        Topic = topic,
-                                                        PartitionId = p.Key,
-                                                        MaxOffsets = maxOffsets,
-                                                        Time = time
-                                                    }
-                                                }
-                                        };
+                        {
+                            Offsets = new List<Offset>
+                            {
+                                new Offset
+                                {
+                                    Topic = topic,
+                                    PartitionId = p.Key,
+                                    MaxOffsets = maxOffsets,
+                                    Time = time
+                                }
+                            }
+                        };
 
                         return route.Connection.SendAsync(request);
                     }).ToArray();
 
+#if NET40
+            await TaskEx.WhenAll(sendRequests).ConfigureAwait(false);
+#else
             await Task.WhenAll(sendRequests).ConfigureAwait(false);
+#endif
             return sendRequests.SelectMany(x => x.Result).ToList();
         }
 

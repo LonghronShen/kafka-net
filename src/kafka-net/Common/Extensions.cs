@@ -116,7 +116,11 @@ namespace KafkaNet.Common
             
             using (cancelRegistration)
             {
+#if NET40
+                if (task != await TaskEx.WhenAny(task, tcs.Task).ConfigureAwait(false))
+#else
                 if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+#endif
                 {
                     throw new OperationCanceledException(cancellationToken);
                 }
@@ -141,7 +145,11 @@ namespace KafkaNet.Common
 
             using (cancelRegistration)
             {
+#if NET40
+                if (task != await TaskEx.WhenAny(task, tcs.Task).ConfigureAwait(false))
+#else
                 if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+#endif
                 {
                     throw new OperationCanceledException(cancellationToken);
                 }

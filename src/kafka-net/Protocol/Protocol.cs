@@ -12,12 +12,18 @@ namespace KafkaNet.Protocol
         public static byte[] Zip(byte[] bytes)
         {
             using (var destination = new MemoryStream())
-            using (var gzip = new GZipStream(destination, CompressionLevel.Fastest, false))
             {
-                gzip.Write(bytes, 0, bytes.Length);
-                gzip.Flush();
-                //gzip.Close();
-                return destination.ToArray();
+#if NET40
+                using (var gzip = new GZipStream(destination, CompressionMode.Compress, false))
+#else
+                using (var gzip = new GZipStream(destination, CompressionLevel.Fastest, false))
+#endif
+                {
+                    gzip.Write(bytes, 0, bytes.Length);
+                    gzip.Flush();
+                    //gzip.Close();
+                    return destination.ToArray();
+                }
             }
         }
 
@@ -161,7 +167,7 @@ namespace KafkaNet.Protocol
         CodecSnappy = 0x02
     }
 
-    #region Exceptions...
+#region Exceptions...
     public class FailCrcCheckException : ApplicationException
     {
         public FailCrcCheckException(string message, params object[] args) : base(string.Format(message, args)) { }
@@ -237,7 +243,7 @@ namespace KafkaNet.Protocol
         public int ErrorCode { get; set; }
         public KafkaApplicationException(string message, params object[] args) : base(string.Format(message, args)) { }
     }
-    #endregion
+#endregion
 
 
 }

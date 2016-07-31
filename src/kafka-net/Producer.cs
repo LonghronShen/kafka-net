@@ -91,12 +91,15 @@ namespace KafkaNet
             BatchSize = DefaultBatchSize;
             BatchDelayTime = TimeSpan.FromMilliseconds(DefaultBatchDelayMS);
 
+#if NET40
+            _postTask = TaskEx.Run(async () =>
+#else
             _postTask = Task.Run(async () =>
+#endif
             {
                 await BatchSendAsync().ConfigureAwait(false);
                 //TODO add log for ending the sending thread.
             });
-
         }
 
         /// <summary>
@@ -126,7 +129,11 @@ namespace KafkaNet
 
             _asyncCollection.AddRange(batch);
 
+#if NET40
+            await TaskEx.WhenAll(batch.Select(x => x.Tcs.Task));
+#else
             await Task.WhenAll(batch.Select(x => x.Tcs.Task));
+#endif
 
             return batch.Select(topicMessage => topicMessage.Tcs.Task.Result)
                                 .Distinct()
@@ -226,7 +233,11 @@ namespace KafkaNet
             var referenceToOutstanding = outstandingSendTasks.Values.ToList();
             if (referenceToOutstanding.Count > 0)
             {
+#if NET40
+                await TaskEx.WhenAll(referenceToOutstanding).ConfigureAwait(false);
+#else
                 await Task.WhenAll(referenceToOutstanding).ConfigureAwait(false);
+#endif
             }
         }
 
@@ -262,7 +273,11 @@ namespace KafkaNet
                         Payload = new List<Payload> { payload }
                     };
 
+#if NET40
+                    _semaphoreMaximumAsync.Wait(cancellationToken);
+#else
                     await _semaphoreMaximumAsync.WaitAsync(cancellationToken).ConfigureAwait(false);
+#endif
 
                     var brokerSendTask = new BrokerRouteSendBatch
                     {
@@ -279,7 +294,11 @@ namespace KafkaNet
 
                 try
                 {
+#if NET40
+                    await TaskEx.WhenAll(sendTasks.Select(x => x.Task)).ConfigureAwait(false);
+#else
                     await Task.WhenAll(sendTasks.Select(x => x.Task)).ConfigureAwait(false);
+#endif
 
                     foreach (var task in sendTasks)
                     {

@@ -66,7 +66,11 @@ namespace KafkaNet.Common
         public async Task<List<T>> TakeAsync(int count, TimeSpan timeout, CancellationToken token)
         {
             var batch = new List<T>(count);
+#if NET40
+            var timeoutTask = TaskEx.Delay(timeout, token);
+#else
             var timeoutTask = Task.Delay(timeout, token);
+#endif
 
             try
             {
@@ -79,7 +83,11 @@ namespace KafkaNet.Common
                         Interlocked.Increment(ref _dataInBufferCount);
                         if (--count <= 0 || timeoutTask.IsCompleted) return batch;
                     }
+#if NET40
+                } while (await TaskEx.WhenAny(_dataAvailableEvent.WaitAsync(), timeoutTask) != timeoutTask);
+#else
                 } while (await Task.WhenAny(_dataAvailableEvent.WaitAsync(), timeoutTask) != timeoutTask);
+#endif
 
                 return batch;
             }

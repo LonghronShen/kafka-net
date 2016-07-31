@@ -150,7 +150,11 @@ namespace KafkaNet
         {
             //This thread will poll the receive stream for data, parce a message out
             //and trigger an event with the message payload
+#if NET40
+            _connectionReadPollingTask = TaskEx.Run(async () =>
+#else
             _connectionReadPollingTask = Task.Run(async () =>
+#endif
                 {
                     try
                     {
@@ -257,7 +261,7 @@ namespace KafkaNet
             }
         }
 
-        #region Class AsyncRequestItem...
+#region Class AsyncRequestItem...
         class AsyncRequestItem : IDisposable
         {
             private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -292,7 +296,7 @@ namespace KafkaNet
                 }
             }
         }
-        #endregion
+#endregion
     }
 
 

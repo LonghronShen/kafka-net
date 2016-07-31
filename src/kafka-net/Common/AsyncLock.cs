@@ -19,7 +19,11 @@ namespace KafkaNet.Common
         public AsyncLock()
         {
             _semaphore = new SemaphoreSlim(1, 1);
+#if NET40
+            _releaser = TaskEx.FromResult(new Releaser(this));
+#else
             _releaser = Task.FromResult(new Releaser(this));
+#endif
         }
 
         public bool IsLocked
@@ -29,10 +33,26 @@ namespace KafkaNet.Common
 
         public Task<Releaser> LockAsync(CancellationToken canceller)
         {
+#if NET40
+            var wait = TaskEx.Run(() =>
+            {
+                _semaphore.Wait();
+            }, canceller);
+#else
             var wait = _semaphore.WaitAsync(canceller);
+#endif
 
             if (wait.IsCanceled) throw new OperationCanceledException("Unable to aquire lock within timeout alloted.");
 
+#if NET40
+            return wait.IsCompleted ?
+                _releaser :
+                wait.ContinueWith((t) =>
+                {
+                    if (t.IsCanceled) throw new OperationCanceledException("Unable to aquire lock within timeout alloted.");
+                    return new Releaser(this);
+                }, canceller, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+#else
             return wait.IsCompleted ?
                 _releaser :
                 wait.ContinueWith((t, state) =>
@@ -40,16 +60,30 @@ namespace KafkaNet.Common
                     if (t.IsCanceled) throw new OperationCanceledException("Unable to aquire lock within timeout alloted.");
                     return new Releaser((AsyncLock)state);
                 }, this, canceller, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+#endif
         }
 
         public Task<Releaser> LockAsync()
         {
+#if NET40
+            var wait = TaskEx.Run(() =>
+            {
+                _semaphore.Wait();
+            });
+
+            return wait.IsCompleted ?
+                _releaser :
+                wait.ContinueWith((t) => new Releaser(this),
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+#else
             var wait = _semaphore.WaitAsync();
             return wait.IsCompleted ?
                 _releaser :
                 wait.ContinueWith((_, state) => new Releaser((AsyncLock)state),
                     this, CancellationToken.None,
                     TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+#endif
         }
 
         public void Dispose()
@@ -63,7 +97,6 @@ namespace KafkaNet.Common
             {
                 using (_semaphore) { }
 #if NETCORE
-                _releaser.Wait(TimeSpan.FromMilliseconds(-1));
 #else
                 using (_releaser) { }
 #endif
