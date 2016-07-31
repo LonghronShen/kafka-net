@@ -1,0 +1,38 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "kafka-net": "1.0.0",
+    "NUnitTestAdapter.WithFramework": "2.0.0",
+    "Newtonsoft.Json": "8.0.3",
+    "Ninject.MockingKernel.Moq": "3.2.2",
+    "NSubstitute": "1.7.2.0",
+    "Ninject.MockingKernel.NSubstitute": "3.2.2"
+  },
+
+  "frameworks": {
+    "net451": {
+      "imports": [
+        "dnxcore50",
+        "dotnet5.6",
+        "portable-net45+win8"
+      ],
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+        "mscorlib": "4.0.0.0",
+        "System.Configuration": "4.0.0.0",
+        "System.Net.Http": "4.0.0.0"
+      }
+    }
+  },
+
+  "commands": {
+  },
+
+  "buildOptions": {
+    "copyToOutput": {
+      "include": [ "App.config" ]
+    }
+  }
+}

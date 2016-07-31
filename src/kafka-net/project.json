@@ -1,0 +1,55 @@
+{
+  "title": "kafka-net",
+  "description": "Native C# client for Apache Kafka.",
+  "authors": [ "James Roland", "LonghronShen" ],
+  "version": "1.0.0-*",
+
+  "packOptions": {
+    "owners": [ "James Roland", "LonghronShen" ],
+    "summary": "Native C# client for Apache Kafka.",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/LonghronShen/kafka-net"
+    }
+  },
+
+  "dependencies": {
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "NETCORE"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": {
+          "version": "1.6.0",
+          "type": "platform"
+        },
+        "System.Diagnostics.Contracts": "4.0.1",
+        "System.Threading.ThreadPool": "4.0.10",
+        "System.Threading.Timer": "4.0.1",
+        "System.Diagnostics.TraceSource": "4.0.0",
+        "System.Net.NameResolution": "4.0.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Threading.Tasks": "4.0.11"
+      },
+      "imports": [
+        "dnxcore50",
+        "dotnet5.6",
+        "portable-net45+win8"
+      ]
+    },
+    "net451": {
+      "imports": [
+        "dnxcore50",
+        "dotnet5.6",
+        "portable-net45+win8"
+      ],
+      "dependencies": {
+      }
+    }
+  }
+}
