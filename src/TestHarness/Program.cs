@@ -14,8 +14,15 @@ namespace TestHarness
         {
             const string topicName = "TestHarness";
 
+            if (args == null || args.Length == 0)
+            {
+                Console.WriteLine("At lease one server address should be provided.");
+                return;
+            }
+
             //create an options file that sets up driver preferences
-            var options = new KafkaOptions(new Uri("http://CSDKAFKA01:9092"), new Uri("http://CSDKAFKA02:9092"))
+            //var options = new KafkaOptions(new Uri("http://CSDKAFKA01:9092"), new Uri("http://CSDKAFKA02:9092"))
+            var options = new KafkaOptions(args.Select(x => new Uri(x)).ToArray())
             {
                 Log = new ConsoleLog()
             };
@@ -31,8 +38,8 @@ namespace TestHarness
             });
 
             //create a producer to send messages with
-            var producer = new Producer(new BrokerRouter(options)) 
-            { 
+            var producer = new Producer(new BrokerRouter(options))
+            {
                 BatchSize = 100,
                 BatchDelayTime = TimeSpan.FromMilliseconds(2000)
             };
@@ -66,7 +73,7 @@ namespace TestHarness
         {
             //send multiple messages
             var sendTask = producer.SendMessageAsync(topicName, Enumerable.Range(0, count).Select(x => new Message(x.ToString())));
-            
+
             Console.WriteLine("Posted #{0} messages.  Buffered:{1} AsyncCount:{2}", count, producer.BufferCount, producer.AsyncCount);
 
             var response = await sendTask;
@@ -76,7 +83,7 @@ namespace TestHarness
             {
                 Console.WriteLine("Topic:{0} PartitionId:{1} Offset:{2}", result.Topic, result.PartitionId, result.Offset);
             }
-            
+
         }
     }
 }
