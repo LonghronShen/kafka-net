@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A77023D-DED9-4BEB-B6AC-75479FED8124}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "kafka-net", "src\kafka-net\kafka-net.xproj", "{5FE63A34-DFDF-42E1-B336-4C1D86028D91}"
