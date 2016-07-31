@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "kafka-net": "1.0.0",
+    "kafka-net": "1.0.0-alpha",
     "NUnitTestAdapter.WithFramework": "2.0.0",
     "Newtonsoft.Json": "8.0.3",
     "Ninject.MockingKernel.Moq": "3.2.2",

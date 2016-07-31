@@ -1,13 +1,15 @@
 {
-  "title": "kafka-net",
+  "title": "kafka-net-core",
   "description": "Native C# client for Apache Kafka.",
   "authors": [ "James Roland", "LonghronShen" ],
-  "version": "1.0.0-*",
+  "version": "1.0.0-alpha",
 
   "packOptions": {
     "requireLicenseAcceptance": false,
     "owners": [ "James Roland", "LonghronShen" ],
     "summary": "Native C# client for Apache Kafka.",
+    "licenseUrl": "https://github.com/Jroland/kafka-net/blob/master/LICENSE",
+    "iconUrl": "http://kafka.apache.org/images/kafka_logo.png",
     "repository": {
       "type": "git",
       "url": "https://github.com/LonghronShen/kafka-net"
@@ -18,24 +20,27 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.3": {
       "buildOptions": {
         "define": [
           "NETCORE"
         ]
       },
       "dependencies": {
-        "NETStandard.Library": {
-          "version": "1.6.0",
-          "type": "platform"
-        },
+        "System.Collections.Concurrent": "4.0.12",
+        "System.Console": "4.0.0",
         "System.Diagnostics.Contracts": "4.0.1",
-        "System.Threading.ThreadPool": "4.0.10",
-        "System.Threading.Timer": "4.0.1",
         "System.Diagnostics.TraceSource": "4.0.0",
+        "System.Interactive.Async": "3.0.0",
+        "System.IO.Compression": "4.1.0",
+        "System.Linq": "4.1.0",
         "System.Net.NameResolution": "4.0.0",
+        "System.Net.Primitives": "4.0.11",
+        "System.Net.Sockets": "4.1.0",
+        "System.Threading.Tasks": "4.0.11",
         "System.Threading.Thread": "4.0.0",
-        "System.Threading.Tasks": "4.0.11"
+        "System.Threading.ThreadPool": "4.0.10",
+        "System.Threading.Timer": "4.0.1"
       },
       "imports": [
         "dnxcore50",
@@ -43,7 +48,7 @@
         "portable-net45+win8"
       ]
     },
-    "net451": {
+    "net45": {
       "imports": [
         "dnxcore50",
         "dotnet5.6",
