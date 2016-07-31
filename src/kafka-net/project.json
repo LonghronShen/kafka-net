@@ -5,6 +5,7 @@
   "version": "1.0.0-*",
 
   "packOptions": {
+    "requireLicenseAcceptance": false,
     "owners": [ "James Roland", "LonghronShen" ],
     "summary": "Native C# client for Apache Kafka.",
     "repository": {
